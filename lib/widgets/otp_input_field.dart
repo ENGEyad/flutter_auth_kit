@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class OtpInputField extends StatefulWidget {
   final int length;
@@ -31,14 +32,8 @@ class _OtpInputFieldState extends State<OtpInputField> {
   @override
   void initState() {
     super.initState();
-    _controllers = List.generate(
-      widget.length,
-      (_) => TextEditingController(),
-    );
-    _focusNodes = List.generate(
-      widget.length,
-      (_) => FocusNode(),
-    );
+    _controllers = List.generate(widget.length, (_) => TextEditingController());
+    _focusNodes = List.generate(widget.length, (_) => FocusNode());
   }
 
   @override
@@ -78,18 +73,30 @@ class _OtpInputFieldState extends State<OtpInputField> {
               textAlign: TextAlign.center,
               keyboardType: TextInputType.number,
               maxLength: 1,
-              style: widget.textStyle ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              enableSuggestions: false,
+              autocorrect: false,
+              autofillHints: index == 0
+                  ? const [AutofillHints.oneTimeCode]
+                  : null,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              style:
+                  widget.textStyle ??
+                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 counterText: '',
                 border: widget.boxDecoration != null
                     ? InputBorder.none
-                    : OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    : OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                 filled: true,
               ),
               onChanged: (value) => _onChanged(index, value),
               onTap: () {
                 if (_controllers[index].text.isEmpty) {
-                  _controllers[index].selection = TextSelection.collapsed(offset: 0);
+                  _controllers[index].selection = TextSelection.collapsed(
+                    offset: 0,
+                  );
                 }
               },
             ),
