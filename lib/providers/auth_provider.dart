@@ -177,10 +177,10 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> logout() async {
     _setLoading(true);
     final result = await _authService.logout();
+    _user = null;
+    _status = AuthStatus.unauthenticated;
     return result.fold(
       (_) {
-        _user = null;
-        _status = AuthStatus.unauthenticated;
         _setLoading(false);
         return true;
       },
